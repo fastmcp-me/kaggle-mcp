@@ -92,9 +92,12 @@ def setup_claude_config():
     if 'mcpServers' not in config:
         config['mcpServers'] = {}
     
-    # Add the Kaggle-MCP configuration
+    # Find the full path to kaggle-mcp
+    kaggle_mcp_path = find_kaggle_mcp_path()
+    
+    # Add the Kaggle-MCP configuration with full path
     kaggle_mcp_config = {
-        "command": "kaggle-mcp"
+        "command": kaggle_mcp_path if kaggle_mcp_path else "kaggle-mcp"
     }
     
     # Add to the config
@@ -106,13 +109,16 @@ def setup_claude_config():
             json.dump(config, f, indent=2)
         
         print("\nSuccessfully updated Claude Desktop configuration!")
+        if kaggle_mcp_path:
+            print(f"Using kaggle-mcp at: {kaggle_mcp_path}")
+        else:
+            print("Warning: Could not find full path to kaggle-mcp, using command name only.")
         print("Please restart Claude Desktop for the changes to take effect.")
         return True
     except Exception as e:
         print(f"Error updating configuration file: {str(e)}")
         print_manual_instructions()
         return False
-
 def print_manual_instructions():
     """Print instructions for manual configuration"""
     print("\nManual Configuration Instructions:")
@@ -120,17 +126,72 @@ def print_manual_instructions():
     print("2. Go to Settings > Developer > Edit Config")
     print("3. Add the following to your claude_desktop_config.json:")
     
-    print("""
-{
-    "mcpServers": {
-        "kaggle": {
-            "command": "kaggle-mcp"
-        }
-    }
-}
+    # Try to find the full path for the manual instructions
+    kaggle_mcp_path = find_kaggle_mcp_path()
+    command_value = kaggle_mcp_path if kaggle_mcp_path else "kaggle-mcp"
+    
+    print(f"""
+{{
+    "mcpServers": {{
+        "kaggle": {{
+            "command": "{command_value}"
+        }}
+    }}
+}}
 """)
     
     print("4. Save the file and restart Claude Desktop")
+
+def find_kaggle_mcp_path():
+    """Find the full path to the kaggle-mcp executable
+    
+    Returns:
+        str: Full path to kaggle-mcp or None if not found
+    """
+    # Try to find in PATH
+    search_paths = os.environ.get("PATH", "").split(os.pathsep)
+    
+    # Add common bin directories
+    if sys.platform == 'darwin':  # macOS
+        for path in ['/usr/local/bin', '/opt/homebrew/bin']:
+            if path not in search_paths:
+                search_paths.append(path)
+    elif sys.platform == 'win32':  # Windows
+        # Add scripts directory in Python installation
+        if hasattr(sys, 'base_prefix'):
+            scripts_dir = os.path.join(sys.base_prefix, 'Scripts')
+            if scripts_dir not in search_paths:
+                search_paths.append(scripts_dir)
+    else:  # Linux/Unix
+        for path in ['/usr/local/bin', '/usr/bin', '/bin']:
+            if path not in search_paths:
+                search_paths.append(path)
+    
+    # Look for kaggle-mcp in all search paths
+    for path in search_paths:
+        executable = os.path.join(path, 'kaggle-mcp')
+        # Add .exe extension for Windows
+        if sys.platform == 'win32' and not executable.endswith('.exe'):
+            executable += '.exe'
+        
+        if os.path.isfile(executable) and os.access(executable, os.X_OK):
+            return executable
+    
+    # Check if we're running from a development environment (e.g., with python -m)
+    try:
+        import kaggle_mcp
+        main_module = getattr(kaggle_mcp, '__main__', None)
+        if main_module and hasattr(main_module, '__file__'):
+            # Running from source, use Python to execute the module
+            python_exec = sys.executable
+            if python_exec:
+                kaggle_mcp_module = 'kaggle_mcp.server'
+                return f"{python_exec} -m {kaggle_mcp_module}"
+    except ImportError:
+        pass
+    
+    # Could not find the executable
+    return None
 
 def main():
     """Main function"""
