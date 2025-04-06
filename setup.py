@@ -7,14 +7,18 @@ setup(
     version="0.1.0",
     description="MCP server for Kaggle API integration",
     author="Kaggle MCP Contributors",
+    author_email="54yyyu@example.com",
+    url="https://github.com/54yyyu/kaggle-mcp",
     packages=find_packages(),
     install_requires=[
-        "mcp>=1.2.0",
+        "mcp>=1.6.0",
         "kaggle>=1.5.0",
+        "uvicorn>=0.23.2",
     ],
     entry_points={
         "console_scripts": [
-            "kaggle-mcp=kaggle_mcp.server:run",
+            "kaggle-mcp=kaggle_mcp.server:main",
+            "kaggle-mcp-setup=kaggle_mcp.setup_helper:main",
         ],
     },
     classifiers=[
@@ -25,6 +29,12 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
+    keywords="kaggle, claude, ai, mcp, model-context-protocol",
     python_requires=">=3.8",
+    project_urls={
+        "Bug Reports": "https://github.com/54yyyu/kaggle-mcp/issues",
+        "Source": "https://github.com/54yyyu/kaggle-mcp",
+    },
 )

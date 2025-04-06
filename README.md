@@ -27,24 +27,24 @@ The following commands install the base version of Kaggle-MCP.
 
 ```bash
 # Install with a single command
-curl -LsSf https://raw.githubusercontent.com/username/kaggle-mcp/main/install.sh | sh
+curl -LsSf https://raw.githubusercontent.com/54yyyu/kaggle-mcp/main/install.sh | sh
 ```
 
 ### Windows
 
 ```powershell
 # Download and run the installer
-powershell -c "Invoke-WebRequest -Uri https://raw.githubusercontent.com/username/kaggle-mcp/main/install.ps1 -OutFile install.ps1; .\install.ps1"
+powershell -c "Invoke-WebRequest -Uri https://raw.githubusercontent.com/54yyyu/kaggle-mcp/main/install.ps1 -OutFile install.ps1; .\install.ps1"
 ```
 
 ### Manual Installation
 
 ```bash
 # Install with pip
-pip install git+https://github.com/username/kaggle-mcp.git
+pip install git+https://github.com/54yyyu/kaggle-mcp.git
 
 # Or better, install with uv
-uv pip install git+https://github.com/username/kaggle-mcp.git
+uv pip install git+https://github.com/54yyyu/kaggle-mcp.git
 ```
 
 ## Configuration
@@ -86,6 +86,28 @@ To use Kaggle-MCP, you need to set up your Kaggle API credentials:
 
 Alternatively, you can authenticate directly through Claude using the `authenticate()` tool with your username and API key.
 
+## Available Tools
+
+The server provides the following tools:
+
+### Authentication and Configuration
+- `authenticate(username, key)`: Authenticate with Kaggle API using credentials
+- `get_config()`: Get current Kaggle API configuration details
+
+### Competitions
+- `list_competitions(search, category)`: List active Kaggle competitions with optional filters
+- `competition_details(competition)`: Get detailed information about a specific competition
+- `competition_download_files(competition, path)`: Download competition files
+
+### Datasets
+- `search_datasets(query, file_type, license_name)`: Search for Kaggle datasets with filters
+- `dataset_details(dataset)`: Get detailed information about a specific dataset
+- `dataset_download_files(dataset, path, unzip)`: Download dataset files
+
+### Kernels and Models
+- `search_kernels(query, language)`: Search for Kaggle kernels/notebooks with filters
+- `search_models(query)`: Search for Kaggle models
+
 ## Examples
 
 Ask Claude:
@@ -109,6 +131,7 @@ Ask Claude:
 - Python 3.8 or newer
 - Claude Desktop or API access
 - Kaggle account with API credentials
+- MCP Python SDK 1.6.0+
 
 ## License
 
